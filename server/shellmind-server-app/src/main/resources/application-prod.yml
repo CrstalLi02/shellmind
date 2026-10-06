@@ -1,0 +1,56 @@
+# Production config: all environment values come from env vars (see .env.example at the repo root).
+# The three database connection fields have no defaults; missing values fail startup so a default DB is not used by accident.
+server:
+  port: ${SERVER_PORT:8091}
+
+# Thread-pool configuration
+thread:
+  pool:
+    executor:
+      config:
+        core-pool-size: ${SHELLMIND_THREAD_CORE_POOL_SIZE:20}
+        max-pool-size: ${SHELLMIND_THREAD_MAX_POOL_SIZE:50}
+        keep-alive-time: 5000
+        block-queue-size: 5000
+        policy: CallerRunsPolicy
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 1024MB
+      max-request-size: 1024MB
+  config:
+    import:
+      - classpath:agent/code-agent.yml
+  datasource:
+    username: ${SHELLMIND_DB_USERNAME}
+    password: ${SHELLMIND_DB_PASSWORD}
+    url: ${SHELLMIND_DB_URL}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  hikari:
+    pool-name: ShellMind_HikariCP
+    minimum-idle: 15
+    idle-timeout: 180000
+    maximum-pool-size: ${SHELLMIND_DB_POOL_SIZE:25}
+    auto-commit: true
+    max-lifetime: 1800000
+    connection-timeout: 30000
+    connection-test-query: SELECT 1
+
+# Intent-recognition model (optional; skip LLM intent classification when api-key is unset)
+intent-ai-api:
+  base-url: ${SHELLMIND_INTENT_AI_BASE_URL:}
+  api-key: ${SHELLMIND_INTENT_AI_API_KEY:}
+  completions-path: chat/completions
+  embeddings-path: embeddings
+  chat-model:
+    model: ${SHELLMIND_INTENT_AI_MODEL:}
+
+mybatis:
+  mapper-locations: classpath:/mybatis/mapper/*.xml
+  config-location: classpath:/mybatis/config/mybatis-config.xml
+
+logging:
+  level:
+    root: info
+  config: classpath:logback-spring.xml

@@ -1,0 +1,62 @@
+server:
+  port: 8091
+
+# Thread-pool configuration
+thread:
+  pool:
+    executor:
+      config:
+        core-pool-size: 20
+        max-pool-size: 50
+        keep-alive-time: 5000
+        block-queue-size: 5000
+        policy: CallerRunsPolicy
+
+# Database config; set database resources at startup
+spring:
+  servlet:
+    multipart:
+      max-file-size: 1024MB
+      max-request-size: 1024MB
+  config:
+    import:
+#      - classpath:agent/test-agent-02.yml
+#      - classpath:agent/test-agent.yml
+#      - classpath:agent/only-one-agent.yml
+#      - classpath:agent/ssh-agent.yml
+      - classpath:agent/code-agent.yml
+#      - classpath:agent/parallel_research_app.yml
+  datasource:
+    username: ${SHELLMIND_DB_USERNAME:root}
+    password: ${SHELLMIND_DB_PASSWORD:}
+    url: ${SHELLMIND_DB_URL:jdbc:mysql://127.0.0.1:3306/shellmind?useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC&useSSL=true}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  hikari:
+    pool-name: Retail_HikariCP
+    minimum-idle: 15 #Minimum idle connections
+    idle-timeout: 180000 #Max idle connection lifetime, default 600000 (10 minutes)
+    maximum-pool-size: 25 #Maximum pool size, default 10
+    auto-commit: true  #Default auto-commit for connections returned from the pool, default true
+    max-lifetime: 1800000 #Max connection lifetime in the pool; 0 means unlimited, default 1800000 (30 minutes)
+    connection-timeout: 30000 #Database connection timeout, default 30 seconds (30000)
+    connection-test-query: SELECT 1
+
+# AI API configuration (intent-recognition only)
+intent-ai-api:
+  base-url: ${SHELLMIND_INTENT_AI_BASE_URL:https://apis.itedus.cn/v1/}
+  api-key: ${SHELLMIND_INTENT_AI_API_KEY:}
+  completions-path: chat/completions
+  embeddings-path: embeddings
+  chat-model:
+    model: ${SHELLMIND_INTENT_AI_MODEL:gpt-5.4}
+
+# MyBatis configuration
+mybatis:
+  mapper-locations: classpath:/mybatis/mapper/*.xml
+  config-location: classpath:/mybatis/config/mybatis-config.xml
+
+# Logging
+logging:
+  level:
+    root: info
+  config: classpath:logback-spring.xml

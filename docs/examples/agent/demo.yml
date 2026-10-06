@@ -1,0 +1,72 @@
+ai:
+  agent:
+    config:
+      tables:
+        demoAgent:
+          app-name: demoAgent
+          agent:
+            agent-id: 100000
+            agent-name: demoAgent
+            agent-desc: demoAgent
+          module:
+            ai-api:
+              base-url: https://apis.itedus.cn
+              api-key: ${SHELLMIND_AI_API_KEY:}
+              completions-path: v1/chat/completions
+              embeddings-path: v1/embeddings
+            chat-model:
+              model: gpt-4.1
+              tool-mcp-list:
+                # SSE structure: configure the required MCP services
+                - sse:
+                    name: baidu-search
+                    base-uri: http://appbuilder.baidu.com/v2/ai_search/mcp/
+                    sse-endpoint: sse?api_key=${BAIDU_APPBUILDER_API_KEY}
+                    request-timeout: 500000
+                # Local MCP service implemented under the ai-agent-scaffold-lite-domain module, in com.shellmind.domain.agent.service.armory.matter.mcp.server
+                - local:
+                    name: myToolCallbackProvider
+              # You can configure skill books under resource/agent/skills.
+              tool-skills-list:
+                - type: resource
+                  path: agent/skills
+            # Under agents you can configure as many single agents as needed. These agents can be composed in agent-workflows using loop, parallel, or sequential. Configure an agent composition based on the user's needs.
+            agents:
+              # Configure an agent: name, description, instruction prompt, and optional output-key. To use an output, reference {output-key} in the next agent.
+              - name: agentDemo01, English name
+                description: Agent purpose description
+                instruction: |
+                  Detailed agent instruction prompt
+                output-key: my_01_out_result
+              # Configure an agent: name, description, instruction prompt, and optional output-key. To use an output, reference {output-key} in the next agent.
+              - name: agentDemo02, English name
+                description: Agent purpose description
+                instruction: |
+                  Detailed agent instruction prompt, {my_01_out_result}
+                output-key: my_02_out_result
+            # agent-workflows compose agents.
+            # 1. loop: run each agent under sub-agents repeatedly. sub-agents references single agents from agents. Execution is analyze, plan, execute. You can set max-iterations.
+            # 2. parallel: run each agent under sub-agents in parallel. sub-agents references single agents from agents. All configured sub-agents run together and their results are collected.
+            # 3. sequential: run each item under sub-agents in order. sub-agents may reference agents as well as loop and parallel workflow names. Use this to execute sub-agents, loop, and parallel agents in sequence.
+            agent-workflows:
+              - type: loop
+                name: loop01, English name
+                description: Loop-agent purpose description
+                max-iterations: max loop steps
+                sub-agents:
+                  - You can configure a single agent from agents
+                  - You can configure a single agent from agents
+              - type: parallel
+                name: parallel01, English name
+                description: Parallel-agent purpose description
+                sub-agents:
+                  - You can configure an agent from agents
+                  - You can configure an agent from agents
+              - type: sequential
+                name: sequential01
+                description: Sequential-agent purpose description
+                sub-agents:
+                  - Configure agent names from agents; add as many as needed
+                  - Configure workflow names from agent-workflows, such as loop01 or parallel01; add as many as needed
+            runner:
+              agent-name: Specify the entry agent to run. This can be a single agent name from agents, or a workflow agent name from agent-workflows, such as agentDemo01, loop01, parallel01, or sequential01

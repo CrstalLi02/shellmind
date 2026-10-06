@@ -1,0 +1,35 @@
+# ---------- General ----------
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.iml
+*.swp
+
+# Local env files (commit .env.example only)
+.env
+.env.*
+!.env.example
+
+# Runtime data and logs
+data/
+logs/
+*.log
+
+# ---------- server (Maven) ----------
+server/**/target/
+
+# ---------- client (Node / Vite) ----------
+client/node_modules/
+client/dist/
+client/*.tsbuildinfo
+client/resources/agent/*
+!client/resources/agent/.gitkeep
+
+# ---------- client (Rust / Tauri) ----------
+client/src-tauri/target/
+client/src-tauri/gen/schemas/
+
+# ---------- deploy ----------
+deploy/data/

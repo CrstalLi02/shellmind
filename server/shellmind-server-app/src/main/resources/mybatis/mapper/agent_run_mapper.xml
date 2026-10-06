@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shellmind.infrastructure.dao.IAgentRunDao">
+
+    <resultMap id="agentRunMap" type="com.shellmind.infrastructure.dao.po.AgentRunPO">
+        <id column="run_id" property="runId"/>
+        <result column="session_id" property="sessionId"/>
+        <result column="user_id" property="userId"/>
+        <result column="agent_id" property="agentId"/>
+        <result column="status" property="status"/>
+        <result column="stop_reason" property="stopReason"/>
+        <result column="round" property="round"/>
+        <result column="total_tool_calls" property="totalToolCalls"/>
+        <result column="total_tokens" property="totalTokens"/>
+        <result column="started_at" property="startedAt"/>
+        <result column="finished_at" property="finishedAt"/>
+        <result column="cancelled" property="cancelled"/>
+        <result column="cancel_reason" property="cancelReason"/>
+        <result column="context_compressed" property="contextCompressed"/>
+        <result column="max_rounds" property="maxRounds"/>
+        <result column="max_tool_calls_per_round" property="maxToolCallsPerRound"/>
+        <result column="max_ai_retries" property="maxAiRetries"/>
+        <result column="idle_timeout_ms" property="idleTimeoutMs"/>
+        <result column="max_token_budget" property="maxTokenBudget"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="columns">
+        run_id, session_id, user_id, agent_id, status, stop_reason, round,
+        total_tool_calls, total_tokens, started_at, finished_at, cancelled,
+        cancel_reason, context_compressed, max_rounds, max_tool_calls_per_round,
+        max_ai_retries, idle_timeout_ms, max_token_budget, created_at, updated_at
+    </sql>
+
+    <insert id="insert" parameterType="com.shellmind.infrastructure.dao.po.AgentRunPO">
+        INSERT INTO agent_run (
+            <include refid="columns"/>
+        ) VALUES (
+            #{runId}, #{sessionId}, #{userId}, #{agentId}, #{status}, #{stopReason},
+            #{round}, #{totalToolCalls}, #{totalTokens}, #{startedAt}, #{finishedAt},
+            #{cancelled}, #{cancelReason}, #{contextCompressed}, #{maxRounds},
+            #{maxToolCallsPerRound}, #{maxAiRetries}, #{idleTimeoutMs},
+            #{maxTokenBudget}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+        )
+    </insert>
+
+    <update id="update" parameterType="com.shellmind.infrastructure.dao.po.AgentRunPO">
+        UPDATE agent_run
+        SET session_id = #{sessionId},
+            user_id = #{userId},
+            agent_id = #{agentId},
+            status = #{status},
+            stop_reason = #{stopReason},
+            round = #{round},
+            total_tool_calls = #{totalToolCalls},
+            total_tokens = #{totalTokens},
+            started_at = #{startedAt},
+            finished_at = #{finishedAt},
+            cancelled = #{cancelled},
+            cancel_reason = #{cancelReason},
+            context_compressed = #{contextCompressed},
+            max_rounds = #{maxRounds},
+            max_tool_calls_per_round = #{maxToolCallsPerRound},
+            max_ai_retries = #{maxAiRetries},
+            idle_timeout_ms = #{idleTimeoutMs},
+            max_token_budget = #{maxTokenBudget},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE run_id = #{runId}
+    </update>
+
+    <select id="queryById" resultMap="agentRunMap">
+        SELECT
+        <include refid="columns"/>
+        FROM agent_run
+        WHERE run_id = #{runId}
+    </select>
+
+    <select id="queryBySessionId" resultMap="agentRunMap">
+        SELECT
+        <include refid="columns"/>
+        FROM agent_run
+        WHERE session_id = #{sessionId}
+        ORDER BY created_at DESC
+        LIMIT #{limit}
+    </select>
+
+</mapper>

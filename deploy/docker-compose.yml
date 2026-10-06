@@ -1,0 +1,76 @@
+# ShellMind server deploy (MySQL + Server)
+#   cp .env.example .env   # fill in values at the repo root
+#   docker compose --env-file .env -f deploy/docker-compose.yml up -d --build
+# Optional DB UI: add --profile tools to start phpMyAdmin
+#
+# For a registry mirror, set MYSQL_IMAGE / PHPMYADMIN_IMAGE in .env.
+
+name: shellmind
+
+services:
+  mysql:
+    image: ${MYSQL_IMAGE:-mysql:8.0.32}
+    command: --default-authentication-plugin=mysql_native_password
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}
+    ports:
+      - "${MYSQL_PORT:-13306}:3306"
+    volumes:
+      - ./mysql/my.cnf:/etc/mysql/conf.d/mysql.cnf:ro
+      # Runs only when the data directory is empty (first start). For existing DBs, apply mysql/migrations manually.
+      - ./mysql/init:/docker-entrypoint-initdb.d:ro
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+
+  server:
+    build:
+      context: ../server
+    image: ${SERVER_IMAGE:-shellmind-server:latest}
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      TZ: Asia/Shanghai
+      SPRING_PROFILES_ACTIVE: prod
+      SHELLMIND_DB_URL: jdbc:mysql://mysql:3306/shellmind?useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
+      SHELLMIND_DB_USERNAME: root
+      SHELLMIND_DB_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      SHELLMIND_SECRET_KEY: ${SHELLMIND_SECRET_KEY:?Set SHELLMIND_SECRET_KEY in .env}
+      SHELLMIND_AI_BASE_URL: ${SHELLMIND_AI_BASE_URL:-}
+      SHELLMIND_AI_API_KEY: ${SHELLMIND_AI_API_KEY:-}
+      SHELLMIND_AI_MODEL: ${SHELLMIND_AI_MODEL:-}
+      SHELLMIND_INTENT_AI_BASE_URL: ${SHELLMIND_INTENT_AI_BASE_URL:-}
+      SHELLMIND_INTENT_AI_API_KEY: ${SHELLMIND_INTENT_AI_API_KEY:-}
+      SHELLMIND_INTENT_AI_MODEL: ${SHELLMIND_INTENT_AI_MODEL:-}
+    ports:
+      - "${SERVER_PORT:-8091}:8091"
+    volumes:
+      - server-data:/app/data
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  phpmyadmin:
+    image: ${PHPMYADMIN_IMAGE:-phpmyadmin:5.2.1}
+    profiles: ["tools"]
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    ports:
+      - "${PHPMYADMIN_PORT:-8899}:80"
+
+volumes:
+  mysql-data:
+  server-data:

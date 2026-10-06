@@ -1,0 +1,299 @@
+@import "tailwindcss";
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* xterm.js scroll support */
+.xterm .xterm-viewport {
+  overflow-y: auto !important;
+}
+
+.xterm .xterm-scrollable-element {
+  overflow-y: auto !important;
+}
+
+:root {
+  --bg-primary: #1e1e1e;
+  --bg-secondary: #252526;
+  --bg-tertiary: #2d2d2d;
+  --border-color: #3c3c3c;
+  --text-primary: #e5e7eb;
+  --text-secondary: #9ca3af;
+}
+
+:root:not([data-theme="light"]) {
+  color-scheme: dark;
+  --focus-ring: rgba(79, 138, 245, 0.28);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --focus-ring: rgba(37, 99, 235, 0.22);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+html {
+  font-size: 14px;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  font-family: system-ui, -apple-system, 'SF Pro Text', sans-serif;
+  overflow: hidden;
+}
+
+#root {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  border-radius: 9999px;
+}
+
+/* unify from set meaning template type select control */
+.model-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+}
+
+.model-select:hover {
+  border-color: color-mix(in srgb, var(--text-secondary) 34%, transparent);
+}
+
+.model-select:focus-visible {
+  border-color: #4f8af5;
+  box-shadow: 0 0 0 2px rgba(79, 138, 245, 0.18);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+
+/* hide scrollbar(no-scrollbar) */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* animation */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.4; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+/* jump action round point animation(three point based on nth jump action) */
+@keyframes bounce-dot {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-3px); opacity: 1; }
+}
+
+/* thinking bar call inhale pulse flush animation */
+@keyframes thinking-pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+/* tool call progress bar pulse flush animation */
+@keyframes progress-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* ProcessTimeline expand animation */
+@keyframes slide-in-from-top {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-in {
+  animation: slide-in-from-top 0.2s ease-out;
+}
+
+/* history panel smooth in animation */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* selected text */
+::selection {
+  background: rgba(79, 138, 245, 0.35);
+}
+
+/* ===== highlight.js dark color theme(GitHub Dark style)-- default ===== */
+.hljs {
+  color: #e6edf3;
+  background: transparent;
+}
+.hljs-comment, .hljs-quote {
+  color: #8b949e;
+  font-style: italic;
+}
+.hljs-keyword, .hljs-selector-tag {
+  color: #ff7b72;
+}
+.hljs-literal, .hljs-type, .hljs-name {
+  color: #ff7b72;
+}
+.hljs-string, .hljs-attr, .hljs-meta-string, .hljs-regexp, .hljs-addition {
+  color: #a5d6ff;
+}
+.hljs-number, .hljs-symbol, .hljs-bullet, .hljs-link, .hljs-meta, .hljs-selector-id, .hljs-selector-class {
+  color: #79c0ff;
+}
+.hljs-built_in, .hljs-title, .hljs-class .hljs-title {
+  color: #ffa657;
+}
+.hljs-function .hljs-title {
+  color: #d2a8ff;
+}
+.hljs-variable, .hljs-template-variable, .hljs-attribute {
+  color: #ffa657;
+}
+.hljs-deletion {
+  color: #ffa657;
+}
+.hljs-emphasis {
+  font-style: italic;
+}
+.hljs-strong {
+  font-weight: bold;
+}
+.hljs-section {
+  color: #58a6ff;
+}
+.hljs-tag {
+  color: #8b949e;
+}
+.hljs-params {
+  color: #e6edf3;
+}
+
+/* ===== highlight.js light theme(VS Code Light style)=====
+   Switched via :root[data-theme="light"], controlled by themeStore */
+:root[data-theme="light"] .hljs,
+:root[data-theme="light"] pre > code.hljs {
+  color: #383a42;
+  background: transparent;
+}
+:root[data-theme="light"] .hljs-comment,
+:root[data-theme="light"] .hljs-quote {
+  color: #a0a1a7;
+  font-style: italic;
+}
+:root[data-theme="light"] .hljs-keyword,
+:root[data-theme="light"] .hljs-selector-tag {
+  color: #e45649;
+}
+:root[data-theme="light"] .hljs-literal,
+:root[data-theme="light"] .hljs-type,
+:root[data-theme="light"] .hljs-name,
+:root[data-theme="light"] .hljs-built_in,
+:root[data-theme="light"] .hljs-title,
+:root[data-theme="light"] .hljs-class .hljs-title {
+  color: #50a14f;  /* green: type name, class name */
+}
+:root[data-theme="light"] .hljs-string,
+:root[data-theme="light"] .hljs-attr,
+:root[data-theme="light"] .hljs-meta-string,
+:root[data-theme="light"] .hljs-regexp,
+:root[data-theme="light"] .hljs-addition {
+  color: #50a14f;  /* green: string */
+}
+:root[data-theme="light"] .hljs-number,
+:root[data-theme="light"] .hljs-symbol,
+:root[data-theme="light"] .hljs-bullet,
+:root[data-theme="light"] .hljs-link,
+:root[data-theme="light"] .hljs-meta,
+:root[data-theme="light"] .hljs-selector-id,
+:root[data-theme="light"] .hljs-selector-class {
+  color: #986801;  /* gold: number/ symbol */
+}
+:root[data-theme="light"] .hljs-function .hljs-title {
+  color: #4078f2;  /* blue: function name */
+}
+:root[data-theme="light"] .hljs-variable,
+:root[data-theme="light"] .hljs-template-variable,
+:root[data-theme="light"] .hljs-attribute {
+  color: #e45649;  /* red: variable */
+}
+:root[data-theme="light"] .hljs-deletion {
+  color: #e45649;
+}
+:root[data-theme="light"] .hljs-section {
+  color: #4078f2;
+}
+:root[data-theme="light"] .hljs-tag {
+  color: #a0a1a7;
+}
+:root[data-theme="light"] .hljs-params {
+  color: #383a42;
+}
+
+/* slightly gray code-block background in the light theme, add strong layer nth feel */
+:root[data-theme="light"] pre {
+  background-color: #f6f8fa !important;
+}
+:root[data-theme="light"] pre code.hljs {
+  background-color: transparent;
+}

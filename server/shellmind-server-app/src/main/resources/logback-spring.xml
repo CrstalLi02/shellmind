@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Log levels from low to high: TRACE < DEBUG < INFO < WARN < ERROR < FATAL. If set to WARN, lower levels are not emitted. -->
+<configuration scan="true" scanPeriod="10 seconds">
+
+    <contextName>logback</contextName>
+    <!-- name is the variable name; value is inserted into the logger context. After defining a variable you can use ${}. -->
+    <springProperty scope="context" name="log.path" source="logging.path"/>
+    <!-- Log pattern -->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+    <conversionRule conversionWord="wex"
+                    converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>
+    <conversionRule conversionWord="wEx"
+                    converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/>
+
+    <!-- Console output -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- Dev appender: lowest configured level; console prints this level and above -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>info</level>
+        </filter>
+        <encoder>
+            <pattern>%d{yy-MM-dd.HH:mm:ss.SSS} [%-16t] %-5p %-22c{0}%X{ServiceId} -%X{trace-id} %m%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- File output -->
+    <!-- Time-rolling INFO log file -->
+    <appender name="INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- Active log file path and name -->
+        <file>./data/log/log_info.log</file>
+        <!-- Log file pattern -->
+        <encoder>
+            <pattern>%d{yy-MM-dd.HH:mm:ss.SSS} [%-16t] %-5p %-22c{0}%X{ServiceId} -%X{trace-id} %m%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <!-- Rolling policy by date and size -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- Daily archive path and pattern -->
+            <fileNamePattern>./data/log/log-info-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- Days to keep log files -->
+            <maxHistory>15</maxHistory>
+            <totalSizeCap>10GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <!-- Time-rolling ERROR log file -->
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- Active log file path and name -->
+        <file>./data/log/log_error.log</file>
+        <!-- Log file pattern -->
+        <encoder>
+            <pattern>%d{yy-MM-dd.HH:mm:ss.SSS} [%-16t] %-5p %-22c{0}%X{ServiceId} -%X{trace-id} %m%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <!-- Rolling policy by date and size -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>./data/log/log-error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- Days to keep log files (tune to disk capacity) -->
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>5GB</totalSizeCap>
+        </rollingPolicy>
+        <!-- WARN and above -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+    </appender>
+
+    <!-- Async output -->
+    <appender name="ASYNC_FILE_INFO" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- If remaining queue capacity is below discardingThreshold, TRACE/DEBUG/INFO are dropped; default -1 = 20% of queueSize; 0 never drops -->
+        <discardingThreshold>0</discardingThreshold>
+        <!-- Queue depth; affects performance. Default 256 -->
+        <queueSize>8192</queueSize>
+        <!-- neverBlock:true may drop logs but does not block the business thread -->
+        <neverBlock>true</neverBlock>
+        <!-- Whether to extract caller data -->
+        <includeCallerData>false</includeCallerData>
+        <appender-ref ref="INFO_FILE"/>
+    </appender>
+
+    <appender name="ASYNC_FILE_ERROR" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- If remaining queue capacity is below discardingThreshold, TRACE/DEBUG/INFO are dropped; default -1 = 20% of queueSize; 0 never drops -->
+        <discardingThreshold>0</discardingThreshold>
+        <!-- Queue depth; affects performance. Default 256 -->
+        <queueSize>1024</queueSize>
+        <!-- neverBlock:true may drop logs but does not block the business thread -->
+        <neverBlock>true</neverBlock>
+        <!-- Whether to extract caller data -->
+        <includeCallerData>false</includeCallerData>
+        <appender-ref ref="ERROR_FILE"/>
+    </appender>
+
+    <!-- Dev profile: console -->
+    <springProfile name="dev">
+        <logger name="com.nmys.view" level="debug"/>
+    </springProfile>
+
+    <root level="info">
+        <appender-ref ref="CONSOLE"/>
+        <!-- Async INFO logs -->
+        <appender-ref ref="ASYNC_FILE_INFO"/>
+        <!-- Async ERROR logs -->
+        <appender-ref ref="ASYNC_FILE_ERROR"/>
+    </root>
+
+</configuration>

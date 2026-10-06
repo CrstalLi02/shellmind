@@ -1,0 +1,42 @@
+ai:
+  agent:
+    config:
+      tables:
+        testAgent03:
+          app-name: testAgent03
+          agent:
+            agent-id: 100003
+            agent-name: Single agent
+            agent-desc: Single agent
+          module:
+            ai-api:
+              base-url: https://apis.itedus.cn
+              api-key: ${SHELLMIND_AI_API_KEY:}
+              completions-path: v1/chat/completions
+              embeddings-path: v1/embeddings
+            chat-model:
+              model: gpt-4.1
+#              tool-mcp-list:
+#                - sse:
+#                    name: baidu-search
+#                    base-uri: http://appbuilder.baidu.com/v2/ai_search/mcp/
+#                    sse-endpoint: sse?api_key=${BAIDU_APPBUILDER_API_KEY}
+#                    request-timeout: 500000
+#                - local:
+#                    name: myToolCallbackProvider
+#              tool-skills-list:
+#                - type: resource
+#                  path: agent/skills
+
+#                - type: directory
+#                  path: /path/to/your/skills
+            agents:
+              - name: onlyAgent
+                description: Learning-project plan for Xiaofuge
+                instruction: |
+                  Search Xiaofuge's hands-on programming projects via Baidu, then produce a learning plan for beginners based on the search results.
+            runner:
+              agent-name: onlyAgent
+              plugin-name-list:
+                - myTestPlugin
+                - myLogPlugin

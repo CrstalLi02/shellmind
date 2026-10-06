@@ -1,0 +1,51 @@
+{
+  "name": "shellmind-client",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "start": "bash ../scripts/dev.sh",
+    "start:clean": "bash ../scripts/dev.sh --clean",
+    "start:server": "bash ../scripts/dev.sh --no-client",
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "tauri:build": "npm run agent:prepare && tauri build",
+    "agent:build": "cd ../server && mvn -DskipTests package",
+    "agent:copy": "mkdir -p resources/agent && cp ../server/shellmind-server-app/target/shellmind-server.jar resources/agent/shellmind-server.jar",
+    "agent:runtime": "node scripts/prepare-runtime.mjs",
+    "agent:prepare": "npm run agent:build && npm run agent:copy && npm run agent:runtime",
+    "agent:verify": "test -f resources/agent/shellmind-server.jar"
+  },
+  "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
+    "@tailwindcss/vite": "^4.2.4",
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-dialog": "^2.7.1",
+    "@tauri-apps/plugin-fs": "^2.5.1",
+    "@tauri-apps/plugin-opener": "^2",
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/addon-web-links": "^0.12.0",
+    "@xterm/addon-webgl": "^0.19.0",
+    "@xterm/xterm": "^6.0.0",
+    "highlight.js": "^11.11.1",
+    "lowlight": "^3.3.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-markdown": "^10.1.0",
+    "rehype-highlight": "^7.0.2",
+    "remark-gfm": "^4.0.1",
+    "tailwindcss": "^4.2.4",
+    "zustand": "^5.0.12"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.11.3",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.6.0",
+    "typescript": "~5.8.3",
+    "vite": "^7.0.4",
+    "vite-plugin-monaco-editor": "^1.1.0"
+  }
+}

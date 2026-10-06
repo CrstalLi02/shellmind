@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shellmind.infrastructure.dao.IChatSessionDao">
+
+    <resultMap id="chatSessionMap" type="com.shellmind.infrastructure.dao.po.ChatSessionPO">
+        <id column="id" property="id"/>
+        <result column="agent_id" property="agentId"/>
+        <result column="user_id" property="userId"/>
+        <result column="title" property="title"/>
+        <result column="message_count" property="messageCount"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.shellmind.infrastructure.dao.po.ChatSessionPO">
+        INSERT INTO chat_session (id, agent_id, user_id, title, message_count, created_at, updated_at)
+        VALUES (#{id}, #{agentId}, #{userId}, #{title}, #{messageCount}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        ON DUPLICATE KEY UPDATE updated_at = CURRENT_TIMESTAMP
+    </insert>
+
+    <update id="updateMessageCount" parameterType="java.lang.String">
+        UPDATE chat_session
+        SET message_count = message_count + 1, updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <select id="queryById" parameterType="java.lang.String" resultMap="chatSessionMap">
+        SELECT id, agent_id, user_id, title, message_count, created_at, updated_at
+        FROM chat_session
+        WHERE id = #{id}
+    </select>
+
+</mapper>

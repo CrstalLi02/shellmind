@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shellmind.infrastructure.dao.ICoreMemoryDao">
+
+    <resultMap id="coreMemoryMap" type="com.shellmind.infrastructure.dao.po.CoreMemoryPO">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="scope" property="scope"/>
+        <result column="category" property="category"/>
+        <result column="title" property="title"/>
+        <result column="keywords" property="keywords"/>
+        <result column="content" property="content"/>
+        <result column="priority" property="priority"/>
+        <result column="source_session_id" property="sourceSessionId"/>
+        <result column="use_count" property="useCount"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="last_used_at" property="lastUsedAt"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.shellmind.infrastructure.dao.po.CoreMemoryPO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO core_memory (user_id, scope, category, title, keywords, content, priority, source_session_id, use_count, created_at, last_used_at)
+        VALUES (#{userId}, #{scope}, #{category}, #{title}, #{keywords}, #{content}, #{priority}, #{sourceSessionId}, #{useCount}, #{createdAt}, #{lastUsedAt})
+    </insert>
+
+    <!-- Keyword match query: the keywords field contains any keyword (OR) -->
+    <select id="queryByUserIdAndKeywords" resultMap="coreMemoryMap">
+        SELECT id, user_id, scope, category, title, keywords, content, priority, source_session_id, use_count, created_at, last_used_at
+        FROM core_memory
+        WHERE user_id = #{userId}
+        AND priority >= 3
+        AND (
+            <foreach collection="keywords" item="kw" separator=" OR ">
+                keywords LIKE CONCAT('%', #{kw}, '%')
+            </foreach>
+        )
+        ORDER BY priority DESC, last_used_at DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- Get all memories for a user (sorted by priority and time) -->
+    <select id="queryByUserId" resultMap="coreMemoryMap">
+        SELECT id, user_id, scope, category, title, keywords, content, priority, source_session_id, use_count, created_at, last_used_at
+        FROM core_memory
+        WHERE user_id = #{userId}
+        ORDER BY priority DESC, last_used_at DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- Update usage: lastUsedAt + increment useCount -->
+    <update id="updateUseStats">
+        UPDATE core_memory
+        SET last_used_at = #{lastUsedAt},
+            use_count = use_count + #{useCount}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM core_memory WHERE id = #{id}
+    </delete>
+
+    <!-- Find cold memories: unused for a long time + low priority -->
+    <select id="queryColdMemories" resultMap="coreMemoryMap">
+        SELECT id, user_id, scope, category, title, keywords, content, priority, source_session_id, use_count, created_at, last_used_at
+        FROM core_memory
+        WHERE user_id = #{userId}
+        AND priority <![CDATA[ <= ]]> #{maxPriority}
+        AND last_used_at <![CDATA[ < ]]> DATE_SUB(NOW(), INTERVAL #{minAgeDays} DAY)
+        ORDER BY priority ASC, last_used_at ASC
+        LIMIT #{limit}
+    </select>
+
+    <select id="countByUserId" resultType="int">
+        SELECT COUNT(*) FROM core_memory WHERE user_id = #{userId}
+    </select>
+
+</mapper>

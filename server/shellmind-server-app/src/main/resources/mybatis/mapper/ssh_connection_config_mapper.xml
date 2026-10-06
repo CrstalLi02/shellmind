@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shellmind.infrastructure.dao.ISshConnectionConfigDAO">
+
+    <resultMap id="SshConnectionConfigMap" type="com.shellmind.infrastructure.dao.po.SshConnectionConfigPO">
+        <id column="id" property="id"/>
+        <result column="connection_id" property="connectionId"/>
+        <result column="connect_timeout" property="connectTimeout"/>
+        <result column="keepalive_interval" property="keepaliveInterval"/>
+        <result column="startup_command" property="startupCommand"/>
+        <result column="compression" property="compression"/>
+        <result column="strict_host_key_check" property="strictHostKeyCheck"/>
+        <result column="known_hosts" property="knownHosts"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <insert id="insertOrUpdate" parameterType="com.shellmind.infrastructure.dao.po.SshConnectionConfigPO">
+        INSERT INTO ssh_connection_config (
+            connection_id, connect_timeout, keepalive_interval, startup_command,
+            compression, strict_host_key_check, known_hosts
+        ) VALUES (
+            #{connectionId}, #{connectTimeout}, #{keepaliveInterval}, #{startupCommand},
+            #{compression}, #{strictHostKeyCheck}, #{knownHosts}
+        )
+        ON DUPLICATE KEY UPDATE
+            connect_timeout = VALUES(connect_timeout),
+            keepalive_interval = VALUES(keepalive_interval),
+            startup_command = VALUES(startup_command),
+            compression = VALUES(compression),
+            strict_host_key_check = VALUES(strict_host_key_check),
+            known_hosts = VALUES(known_hosts)
+    </insert>
+
+    <select id="queryByConnectionId" resultMap="SshConnectionConfigMap">
+        SELECT id, connection_id, connect_timeout, keepalive_interval, startup_command,
+               compression, strict_host_key_check, known_hosts, updated_at
+        FROM ssh_connection_config
+        WHERE connection_id = #{connectionId}
+    </select>
+
+</mapper>

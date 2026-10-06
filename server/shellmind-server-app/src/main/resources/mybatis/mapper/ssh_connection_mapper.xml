@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shellmind.infrastructure.dao.ISshConnectionDAO">
+
+    <resultMap id="SshConnectionMap" type="com.shellmind.infrastructure.dao.po.SshConnectionPO">
+        <id column="id" property="id"/>
+        <result column="connection_id" property="connectionId"/>
+        <result column="connection_name" property="connectionName"/>
+        <result column="host" property="host"/>
+        <result column="port" property="port"/>
+        <result column="username" property="username"/>
+        <result column="auth_type" property="authType"/>
+        <result column="password" property="password"/>
+        <result column="private_key" property="privateKey"/>
+        <result column="encrypted" property="encrypted"/>
+        <result column="status" property="status"/>
+        <result column="user_id" property="userId"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.shellmind.infrastructure.dao.po.SshConnectionPO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ssh_connection (
+            connection_id, connection_name, host, port, username, auth_type,
+            password, private_key, encrypted, status, user_id, deleted
+        ) VALUES (
+            #{connectionId}, #{connectionName}, #{host}, #{port}, #{username}, #{authType},
+            #{password}, #{privateKey}, #{encrypted}, #{status}, #{userId}, 0
+        )
+    </insert>
+
+    <update id="update" parameterType="com.shellmind.infrastructure.dao.po.SshConnectionPO">
+        UPDATE ssh_connection
+        SET connection_name = #{connectionName},
+            host = #{host},
+            port = #{port},
+            username = #{username},
+            auth_type = #{authType},
+            password = #{password},
+            private_key = #{privateKey},
+            encrypted = #{encrypted},
+            status = #{status}
+        WHERE connection_id = #{connectionId} AND deleted = 0
+    </update>
+
+    <update id="delete">
+        UPDATE ssh_connection SET deleted = 1 WHERE connection_id = #{connectionId}
+    </update>
+
+    <select id="queryByConnectionId" resultMap="SshConnectionMap">
+        SELECT id, connection_id, connection_name, host, port, username, auth_type,
+               password, private_key, encrypted, status, user_id, created_at, updated_at, deleted
+        FROM ssh_connection
+        WHERE connection_id = #{connectionId} AND deleted = 0
+    </select>
+
+    <select id="queryListByUserId" resultMap="SshConnectionMap">
+        SELECT id, connection_id, connection_name, host, port, username, auth_type,
+               password, private_key, encrypted, status, user_id, created_at, updated_at, deleted
+        FROM ssh_connection
+        WHERE user_id = #{userId} AND deleted = 0
+        ORDER BY created_at DESC
+    </select>
+
+</mapper>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shellmind.infrastructure.dao.ICodePatchDao">
+
+    <resultMap id="codePatchMap" type="com.shellmind.infrastructure.dao.po.CodePatchPO">
+        <id column="patch_id" property="patchId"/>
+        <result column="run_id" property="runId"/>
+        <result column="session_id" property="sessionId"/>
+        <result column="user_id" property="userId"/>
+        <result column="file_path" property="filePath"/>
+        <result column="backup_path" property="backupPath"/>
+        <result column="unified_diff" property="unifiedDiff"/>
+        <result column="status" property="status"/>
+        <result column="lines_added" property="linesAdded"/>
+        <result column="lines_removed" property="linesRemoved"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="columns">
+        patch_id, run_id, session_id, user_id, file_path, backup_path,
+        unified_diff, status, lines_added, lines_removed, created_at, updated_at
+    </sql>
+
+    <insert id="insert" parameterType="com.shellmind.infrastructure.dao.po.CodePatchPO">
+        INSERT INTO code_patch (
+            <include refid="columns"/>
+        ) VALUES (
+            #{patchId}, #{runId}, #{sessionId}, #{userId}, #{filePath},
+            #{backupPath}, #{unifiedDiff}, #{status}, #{linesAdded},
+            #{linesRemoved}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+        )
+    </insert>
+
+    <update id="updateStatus" parameterType="com.shellmind.infrastructure.dao.po.CodePatchPO">
+        UPDATE code_patch
+        SET status = #{status}, updated_at = CURRENT_TIMESTAMP
+        WHERE patch_id = #{patchId}
+    </update>
+
+    <select id="queryById" resultMap="codePatchMap">
+        SELECT <include refid="columns"/> FROM code_patch WHERE patch_id = #{patchId}
+    </select>
+
+    <select id="queryByRunId" resultMap="codePatchMap">
+        SELECT <include refid="columns"/> FROM code_patch WHERE run_id = #{runId}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="queryBySessionId" resultMap="codePatchMap">
+        SELECT <include refid="columns"/> FROM code_patch WHERE session_id = #{sessionId}
+        ORDER BY created_at DESC LIMIT #{limit}
+    </select>
+
+    <select id="queryUnapprovedBySessionId" resultMap="codePatchMap">
+        SELECT <include refid="columns"/> FROM code_patch
+        WHERE session_id = #{sessionId} AND status = 'APPLIED'
+        ORDER BY created_at DESC LIMIT #{limit}
+    </select>
+
+</mapper>
