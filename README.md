@@ -19,7 +19,7 @@
 
 ---
 
-Tell ShellMind what you want, in plain English or Chinese:
+Tell ShellMind what you want:
 
 > *"Find out why CPU is spiking on the prod box, then bump the timeout in my local project to 30s and run the tests."*
 
